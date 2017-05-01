@@ -46,6 +46,10 @@ typedef union {
 
 /* Local variables -----------------------------------------------------------*/
 
+static bool             g_have_player_window = true;
+static bool             g_have_font = true;
+
+
 static const uint32_t   g_sample_rate = 44100;
 static SDL_AudioSpec    g_sdl_audio_spec;
 static SDL_Window*      g_window;
@@ -69,15 +73,17 @@ static int init_sdl(void)
             break;
         }
 
-        if (SDL_CreateWindowAndRenderer(320, 240, SDL_WINDOW_RESIZABLE, &g_window, &g_renderer)) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
-            break;
-        }
+        if (g_have_player_window) {
+            if (SDL_CreateWindowAndRenderer(320, 240, SDL_WINDOW_RESIZABLE, &g_window, &g_renderer)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
+                break;
+            }
     
-        TTF_Init();
-        if ((g_text_font = TTF_OpenFont("Perfect DOS VGA 437.ttf", 16)) == NULL) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
-            break;
+            TTF_Init();
+            if ((g_text_font = TTF_OpenFont("Perfect DOS VGA 437.ttf", 16)) == NULL) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
+                g_have_font = false;
+            }
         }
 
         g_sdl_audio_spec.freq = g_sample_rate;
@@ -103,8 +109,10 @@ static int init_sdl(void)
 
 static void close_sdl(void)
 {
-    SDL_DestroyRenderer(g_renderer);
-    SDL_DestroyWindow(g_window);
+    if (g_have_player_window) {
+        SDL_DestroyRenderer(g_renderer);
+        SDL_DestroyWindow(g_window);
+    }
 
     SDL_Quit();    
 }
@@ -135,6 +143,8 @@ static void update_display(void)
 {
     char txt[256];
     SDL_Color color;
+    
+    if (!g_have_font) return;
     
     snprintf(txt, sizeof(txt), "p%03d - r%03d", g_current_pattern, g_current_row);
     txt[255] = '\0';
@@ -180,7 +190,6 @@ int main(int argc, char* argv[])
     bool running = 1;
     bool is_paused = false;
     
-//    const char* filename = "../../../Sonstige/__MySource/Crissoft/stracker/s/crissoft/TEST_P_V.S3M";
     const char* filename;
     
     SDL_Event event;
@@ -212,10 +221,10 @@ int main(int argc, char* argv[])
     //s3m_print_arrangement(&g_s3m);
     //s3m_print_instruments(&g_s3m);
     //s3m_print_patterns(&g_s3m);       
-    play();
+    if (running) play();
     
     while (running) {
-        SDL_RenderClear(g_renderer);        
+        if (g_have_player_window) SDL_RenderClear(g_renderer);        
         
         SDL_WaitEventTimeout(&event,10);
 
@@ -247,7 +256,7 @@ int main(int argc, char* argv[])
             break;       
         
         case SDL_USEREVENT:
-            update_display();
+            if (g_have_player_window) update_display();
             evt_data_t ed;
             ed.v = event.user.data1;
             g_current_pattern = ed.u8[0];
@@ -255,7 +264,7 @@ int main(int argc, char* argv[])
             break;
         }
 
-        SDL_RenderPresent(g_renderer);
+        if (g_have_player_window) SDL_RenderPresent(g_renderer);
     }
     
     SDL_PauseAudio(1);
