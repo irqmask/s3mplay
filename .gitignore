@@ -1,0 +1,52 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Libraries
+#*.lib lib files are needed for PCB design with Kicad
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# listings and reports
+*.lst
+*.map
+*.log
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+*.eep
+
+# Directories
+**/bin
+**/build
+**/CMakeFiles
+**/3rd_party/**
+
+# Eclipse project files
+.project
+.cproject
+.directory
+.metadata
+**/.settings
+
+# Intermediate and backup files
+*.bak
+*.kdev4
+*_version.h
+*_old.*
+
+# Other
+*.ps
+3rd_party
