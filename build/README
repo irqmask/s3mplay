@@ -1,0 +1,6 @@
+Prerquisites:
+SDL2 development library.
+
+How to build:
+cmake ../src
+make
