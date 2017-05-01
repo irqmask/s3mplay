@@ -7,7 +7,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 #if you don't want the full compiler output, remove the following line
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set (CMAKE_MODULE_PATH /home/christian/Code/PC/s3mplay/src/)
+set (CMAKE_MODULE_PATH ../src)
 
 INCLUDE(FindPkgConfig)
 find_package(SDL2TTF)
