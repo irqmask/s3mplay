@@ -216,7 +216,6 @@ void s3m_stop(s3m_t* s3m);
 
 uint8_t s3m_get_current_pattern_idx(s3m_t* s3m);
 uint8_t s3m_get_current_row_idx(s3m_t* s3m);
-void s3m_get_current_row(s3m_t* s3m, pat_row_t* row);
 void s3m_register_row_changed_callback(s3m_t* s3m, s3m_func_t func, void* arg);
 
 

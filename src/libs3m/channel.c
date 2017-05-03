@@ -97,8 +97,8 @@ void chn_update_sample_increment(s3m_t* s3m, channel_t* chn)
 
 void chn_calc_note_incr(s3m_t* s3m, channel_t* chn, uint8_t note)
 {
-    uint8_t n, o, of;
-    double instr_c4_speed, herz, incr;
+    uint8_t n, o;
+    double instr_c4_speed;
     
     o = note >> 4;
     n = note & 0x0F;
@@ -168,7 +168,7 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
             chn->vol_slide = -(param &= 0x0F);
         }
         // DxF: fine volume slide up by x
-        else if (param & 0x0F == 0x0F) {
+        else if ((param & 0x0F) == 0x0F) {
             chn->vol_slide = (param & 0xF0) >> 4;         
         }
         // D0x or Dx0: volume slide down/up
@@ -289,7 +289,7 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
         
     case 'O'-64:
         // Oxx: Set SampleOffset = xx00h
-        if (((uint16_t)param << 8) < chn->pi->sample.length) {
+        if (((uint32_t)param << 8) < chn->pi->sample.length) {
             chn->sam_pos = param;
             chn->sam_pos *= 0x100;
         }
@@ -336,8 +336,6 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
 void chn_do_fx_frame(s3m_t* s3m, channel_t* chn)
 {
     int16_t val;
-    
-    uint8_t slide;
     
     if (chn->do_vol_slide) {
         chn->vol += chn->vol_slide;
@@ -463,15 +461,14 @@ int16_t chn_get_sample(s3m_t* s3m, channel_t* chn)
 {
     uint8_t raw_sample = 0;
     int16_t sample = 0;
-    int16_t vol;
     uint32_t spos;
     
-    spos = (chn->sam_pos + 0.5);
+    spos = (uint32_t)(chn->sam_pos + 0.5);
     if (chn->pi != NULL && chn->ps != NULL && spos < chn->pi->sample.length) {
         raw_sample = chn->ps[spos];
         
         chn->sam_pos = chn->sam_pos + chn->sam_incr;
-        spos = chn->sam_pos + 0.5;
+        spos = (uint32_t)(chn->sam_pos + 0.5);
         
         // is sample looped?
         if (chn->pi->sample.flags & S3M_FLAG_INSTR_LOOP) {

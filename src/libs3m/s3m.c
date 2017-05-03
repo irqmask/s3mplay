@@ -165,8 +165,9 @@ int s3m_initialize(s3m_t* s3m, uint32_t samplerate)
     
     for (i=0; i<S3M_VIBRATO_TABLE_SIZE; i++) {
         vib_val = (sin(2*i*PI/S3M_VIBRATO_TABLE_SIZE) * 256);
-        s3m->vibrato_table[i] = vib_val + 0.5;
+        s3m->vibrato_table[i] = (int16_t)(vib_val + 0.5);
     }
+    return 0;
 }
 
 /** 
@@ -188,8 +189,7 @@ void s3m_register_row_changed_callback(s3m_t* s3m, s3m_func_t func, void* arg)
  */
 int s3m_from_ram(s3m_t* s3m, uint8_t* buffer, size_t length)
 {
-    int i,o, retval = -1;
-    double incr;
+    int retval = -1;
     
     assert(s3m != NULL);
     
@@ -281,25 +281,6 @@ uint8_t s3m_get_current_row_idx(s3m_t* s3m)
     assert(s3m != NULL);
 
     return s3m->rt.row_ctr;
-}
-
-/** 
- * Copy the current row data. 
- * 
- * This function is expected mainly to be used for visualization in S3M player apps.
- * To avoid synchronization with the audio thread, 
- * internally a A/B buffer is used e.g. the thread writes into B while this 
- * function reads from A. When the thred is finished writing, is switches the 
- * pages and will now write to A and this function will read B.
- *
- * @note Be aware, the pattern index is changed within the context of the audio 
- * callback function s3m_sound_callback(). This might be another thread and no 
- * synchronization tchnique is used to get it!
- */
-void s3m_get_current_row(s3m_t* s3m, pat_row_t* row)
-{
-    assert(s3m != NULL);
-    //! @todo implement
 }
 
 /* EOF: s3m.c */

@@ -46,12 +46,6 @@
 
 /* Local functions -----------------------------------------------------------*/
 
-static uint32_t round_to_u32(double value)
-{
-    value += 0.5;
-    return value;
-}
-
 static void process_row(s3m_t* s3m)
 {
     int c;
@@ -144,8 +138,8 @@ static void mix_samples_of_channels(s3m_t* s3m, int16_t* l_sample, int16_t* r_sa
     }
     
     volfact = s3m->rt.global_vol * s3m->rt.master_vol / (64.0*64.0); 
-    l = ls * volfact;
-    r = rs * volfact;
+    l = (int32_t)(ls * volfact);
+    r = (int32_t)(rs * volfact);
     
     //l=ls /lcc;
     //r = rs / rcc;
@@ -170,7 +164,7 @@ void s3m__set_tempo(s3m_t* s3m, uint8_t tempo)
     if (tempo == 0) return;
     s3m->rt.tempo = tempo;
     sample_per_frame = 2.5 * s3m->samplerate / s3m->rt.tempo;
-    s3m->rt.sample_per_frame = round_to_u32(sample_per_frame);
+    s3m->rt.sample_per_frame = (uint32_t)(sample_per_frame + 0.5);
     s3m->rt.sample_ctr = s3m->rt.sample_per_frame - 1;
 }
 

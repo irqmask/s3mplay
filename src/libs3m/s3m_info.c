@@ -168,7 +168,6 @@ void s3m_print_channels(s3m_t* s3mHandle)
 void s3m_print_arrangement(s3m_t* s3m)
 {
     int i;
-    uint8_t cs;
     
     s3m_header_t* h;
     h = s3m->header;

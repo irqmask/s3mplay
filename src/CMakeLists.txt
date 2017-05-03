@@ -7,14 +7,13 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 #if you don't want the full compiler output, remove the following line
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set (CMAKE_MODULE_PATH ../src)
+#add_definitions(-Wall)
+if (WIN32)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
 
-INCLUDE(FindPkgConfig)
-find_package(SDL2TTF)
-
-PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+find_file(SDL2_INCLUDE_DIR NAME SDL.h HINTS SDL2)
+find_library(SDL2_LIBRARY NAME SDL2)
 
 add_subdirectory (libs3m)
-
 add_subdirectory (s3mplay)
