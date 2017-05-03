@@ -6,7 +6,6 @@ set(s3mplay_SRC
 
 include_directories(${SDL2_INCLUDE_DIR} ../libs3m)
 
-#list all source files here
-add_executable(s3mplay main.cpp)
+add_executable(s3mplay ${s3mplay_SRC})
 
 target_link_libraries(s3mplay libs3m ${SDL2_LIBRARY})
