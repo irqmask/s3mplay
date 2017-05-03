@@ -14,3 +14,5 @@ add_executable(s3mplay ${s3mplay_SRC})
 
 #need to link to some other libraries ? just add them here
 target_link_libraries(s3mplay ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARY} libs3m)
+
+install(TARGETS s3mplay RUNTIME DESTINATION bin)
