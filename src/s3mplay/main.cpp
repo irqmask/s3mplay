@@ -169,7 +169,6 @@ int main(int argc, char* argv[])
     
     printf("s3mplay - A simple S3M music player - created 2017 by irqmask\n");
     if (argc < 2) {
-        printf("s3mplay\n");
         printf("usage: s3mplay [filename.s3m]\n");
         printf("Playing will automatically start.\n");
         printf("Keys during playing:\n");

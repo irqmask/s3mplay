@@ -9,3 +9,6 @@ include_directories(${SDL2_INCLUDE_DIR} ../libs3m)
 add_executable(s3mplay ${s3mplay_SRC})
 
 target_link_libraries(s3mplay libs3m ${SDL2_LIBRARY})
+
+install(TARGETS s3mplay RUNTIME DESTINATION bin)
+
