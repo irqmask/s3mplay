@@ -4,4 +4,4 @@
 </a>
 
 # s3mplay
-A music player library for S3M tracker musik along with a litte player application
+A music player library for S3M tracker music along with a litte player application
