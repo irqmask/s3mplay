@@ -463,13 +463,13 @@ void chn_do_fx_frame(s3m_t* s3m, channel_t* chn)
 
 int16_t chn_get_sample(s3m_t* s3m, channel_t* chn)
 {
-    uint8_t raw_sample = 0;
+    (void)s3m;
     int16_t sample = 0;
     uint32_t spos;
     
     spos = (uint32_t)(chn->sam_pos + 0.5);
     if (chn->pi != NULL && chn->ps != NULL && spos < chn->pi->sample.length) {
-        raw_sample = chn->ps[spos];
+        uint8_t raw_sample = chn->ps[spos];
         
         chn->sam_pos = chn->sam_pos + chn->sam_incr;
         spos = (uint32_t)(chn->sam_pos + 0.5);
@@ -481,8 +481,9 @@ int16_t chn_get_sample(s3m_t* s3m, channel_t* chn)
                 chn->sam_pos += chn->pi->sample.loop_begin;
             }
         }
+        sample = raw_sample;
+        sample -= 128;
     }
-    sample = raw_sample - 128;
     sample = sample * chn->vol;
     
     return sample;
