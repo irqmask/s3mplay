@@ -351,16 +351,16 @@ void chn_do_fx_frame(s3m_t* s3m, channel_t* chn)
     }
     if (chn->do_tone_porta) {
         chn->sam_period += chn->tone_slide;
-        if (chn->sam_target_period < chn->sam_period) {
+        if (chn->tone_slide < 0.001) {
             if (chn->sam_period <= chn->sam_target_period) { // target reached?
                 chn->sam_period = chn->sam_target_period;
-                chn->tone_slide = 0;
+                chn->tone_slide = 0.0;
             }
         } 
-        if (chn->sam_target_period > chn->sam_period) {
+        if (chn->tone_slide > 0.001) {
             if (chn->sam_period >= chn->sam_target_period) { // target reached?
                 chn->sam_period = chn->sam_target_period;
-                chn->tone_slide = 0;
+                chn->tone_slide = 0.0;
             }
         }        
     }
