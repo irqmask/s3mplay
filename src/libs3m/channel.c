@@ -477,7 +477,8 @@ int16_t chn_get_sample(s3m_t* s3m, channel_t* chn)
         // is sample looped?
         if (chn->pi->sample.flags & S3M_FLAG_INSTR_LOOP) {
             if (spos >= chn->pi->sample.loop_end) {
-                chn->sam_pos = chn->pi->sample.loop_begin;
+                chn->sam_pos -= chn->pi->sample.loop_end;
+                chn->sam_pos += chn->pi->sample.loop_begin;
             }
         }
     }
