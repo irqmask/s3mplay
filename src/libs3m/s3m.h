@@ -123,7 +123,7 @@ typedef struct _channel {
     uint8_t             instr;      // index of instrument/sample
     
     s3m_instrument_t*   pi;         // pointer to instrument structure
-    int8_t*             ps;         // pointer to sample data
+    uint8_t*            ps;         // pointer to sample data
     
     int16_t              vol;       // current channel volume
     
