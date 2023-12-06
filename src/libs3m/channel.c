@@ -97,6 +97,7 @@ void chn_update_sample_increment(s3m_t* s3m, channel_t* chn)
 
 void chn_calc_note_incr(s3m_t* s3m, channel_t* chn, uint8_t note)
 {
+    uint32_t period;
     uint8_t n, o;
     double instr_c4_speed;
     
@@ -110,7 +111,10 @@ void chn_calc_note_incr(s3m_t* s3m, channel_t* chn, uint8_t note)
     //                             instrument_c4_speed
     instr_c4_speed = chn->pi->sample.c4_speed;
     chn->sam_last_period = chn->sam_target_period;
-    chn->sam_target_period = (8363.0 * 16 * (g_note_period[n] >> o)) / instr_c4_speed;
+    period = (8363 * 16) * g_note_period[n];
+    period >>= o;
+    chn->sam_target_period = period;
+    chn->sam_target_period /= instr_c4_speed;
     chn->sam_period = chn->sam_target_period; // use this if no tone portamento or vibrato is done
     chn_update_sample_increment(s3m, chn);
 }
