@@ -310,6 +310,11 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
         // Vxx: Set global volume (0..64)
         s3m__set_global_vol(s3m, param);
         break;
+
+    case 'T'-64:
+        if (param >= 0x20)
+            s3m__set_tempo(s3m, param);
+        break;
     // ...
         
     default:
