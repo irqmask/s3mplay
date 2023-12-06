@@ -25,13 +25,16 @@
  */
 
 /* Include section -----------------------------------------------------------*/
+
+#include <iostream>
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#define SDL_MAIN_HANDLED
 #include <SDL.h>
-#include <SDL_ttf.h>
 
 #include "s3m.h"
 
@@ -59,8 +62,6 @@ static s3m_t            g_s3m;
 static uint8_t          g_current_pattern = 0;
 static uint8_t          g_current_row = 0;
 
-static TTF_Font*        g_text_font = NULL;
-
 /* Global variables ----------------------------------------------------------*/
 
 static int init_sdl(void) 
@@ -77,12 +78,6 @@ static int init_sdl(void)
             if (SDL_CreateWindowAndRenderer(320, 240, SDL_WINDOW_RESIZABLE, &g_window, &g_renderer)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
                 break;
-            }
-    
-            TTF_Init();
-            if ((g_text_font = TTF_OpenFont("Perfect DOS VGA 437.ttf", 16)) == NULL) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
-                g_have_font = false;
             }
         }
 
@@ -140,30 +135,8 @@ static void stop(void)
 }
 
 static void update_display(void)
-{
-    char txt[256];
-    SDL_Color color;
-    
-    if (!g_have_font) return;
-    
-    snprintf(txt, sizeof(txt), "p%03d - r%03d", g_current_pattern, g_current_row);
-    txt[255] = '\0';
-    color.r = 200;
-    color.g = 200;
-    color.b = 200;
-    color.a = 10;   
-    
-    SDL_Surface* surface = TTF_RenderText_Solid(g_text_font, txt, color);
-    
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(g_renderer, surface);
-
-    SDL_Rect rect; //create a rect
-    rect.x = 10;  //controls the rect's x coordinate 
-    rect.y = 10; // controls the rect's y coordinte
-    rect.w = 11*16; // controls the width of the rect
-    rect.h = 16; // controls the height of the rect
-
-    SDL_RenderCopy(g_renderer, texture, NULL, &rect);
+{   
+    printf("p%03d - r%03d\r", g_current_pattern, g_current_row);
 }
 
 static void row_changed_func(s3m_t* s3m, void* arg)
@@ -193,9 +166,9 @@ int main(int argc, char* argv[])
     const char* filename;
     
     SDL_Event event;
-       
+    
+    printf("s3mplay - A simple S3M music player - created 2017 by irqmask\n");
     if (argc < 2) {
-        printf("s3mplay\n");
         printf("usage: s3mplay [filename.s3m]\n");
         printf("Playing will automatically start.\n");
         printf("Keys during playing:\n");
@@ -216,6 +189,7 @@ int main(int argc, char* argv[])
         printf("File %s not found!\n", filename);
         running = 0;
     }
+    printf("now playing: %s - Title: %s\n", filename, g_s3m.header->song_name);
     //s3m_print_header(&g_s3m);
     //s3m_print_channels(&g_s3m);
     //s3m_print_arrangement(&g_s3m);
