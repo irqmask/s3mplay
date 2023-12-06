@@ -118,7 +118,7 @@ static void load_samples(s3m_t* s3m, uint8_t* buffer, size_t length)
                         s3m->instrument[i]->sample.file_offs_sample[2] << 8 |
                         s3m->instrument[i]->sample.file_offs_sample[1];
             smpl_offs <<= 4;
-            if (smpl_offs >= length || (smpl_offs+s3m->instrument[i]->sample.length) >= length) {
+            if (smpl_offs >= length || (smpl_offs+s3m->instrument[i]->sample.length) > length) {
                 printf("ERROR: sample pointer out of file for instrument %d of type %d \n", i, s3m->instrument[i]->type);
                 continue;
             }
