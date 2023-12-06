@@ -153,6 +153,14 @@ void chn_set_volume(s3m_t* s3m, channel_t* chn, uint8_t vol)
 
 void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
 {
+    chn->do_vol_slide = false;
+    chn->do_tone_slide = false;
+    chn->do_tone_porta = false;
+    chn->do_vibrato = false;
+    chn->do_tremor = false;
+    chn->do_arpeggio = false;
+    chn->do_tremolo = false;
+
     switch (cmd) {
     case 'A'-64:
         // Axx: Set speed to xx (default 06)
@@ -177,13 +185,7 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
         }
         // D0x or Dx0: volume slide down/up
         else if (param != 0x00) {
-            chn->do_vol_slide = true;
-            chn->do_tone_slide = false;
-            chn->do_tone_porta = false;
-            chn->do_vibrato = false;
-            chn->do_tremor = false;
-            chn->do_arpeggio = false;
-            chn->do_tremolo = false;            
+            chn->do_vol_slide = true;         
         }
         // only fine volume slide
         if (!chn->do_vol_slide) {
@@ -197,58 +199,46 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
         // EFx: Fine slide down by x
         if ((param & 0xF0) == 0xF0) {
             // sliding down tonal means increasing the period
-            chn->tone_slide = (param & 0x0F) * 5;
+            chn->tone_slide = (param & 0x0F) * 1.2;
         } 
         // EEx: Extra fine slide down by x
         else if ((param & 0xF0) == 0xE0) {
             // sliding down tonal means increasing the period
-            chn->tone_slide = (param & 0x0F);
+            chn->tone_slide = (param & 0x0F) * 0.3;
         }
         // Exx: slide down by xx every frame
         else if (param != 0x00) {            
             // save for use in every frame
-            chn->tone_slide = param * 3.33;
-            chn->do_vol_slide = false;
-            chn->do_tone_slide = true;
-            chn->do_tone_porta = false;
-            chn->do_vibrato = false;
-            chn->do_tremor = false;
-            chn->do_arpeggio = false;
-            chn->do_tremolo = false;                       
+            chn->tone_slide = param * 3.6;
         }
-        // E00: repeat last slide
-        if (!chn->do_tone_slide) {
-            chn->sam_period += chn->tone_slide;
+        else {
+            // E00: repeat last slide
+            // no need to recalculate
         }
+        chn->do_tone_slide = true;
         break;
         
     case 'F'-64:
         // FFx: Fine slide up by x
         if ((param & 0xF0) == 0xF0) {
             // sliding up tonal means decreasing the period
-            chn->tone_slide = -(param & 0x0F) * 5;
+            chn->tone_slide = -(param & 0x0F) * 1.2;
         } 
         // FEx: Extra fine slide up by x
         else if ((param & 0xF0) == 0xE0) {
             // sliding up tonal means decreasing the period
-            chn->tone_slide = -(param & 0x0F);
+            chn->tone_slide = -(param & 0x0F) * 0.3;
         }
         // Fxx: slide up by xx every frame
         else if (param != 0x00) {            
             // save for use in every frame
-            chn->tone_slide = -param * 3.33;
-            chn->do_vol_slide = false;
-            chn->do_tone_slide = true;
-            chn->do_tone_porta = false;
-            chn->do_vibrato = false;
-            chn->do_tremor = false;
-            chn->do_arpeggio = false;
-            chn->do_tremolo = false;             
+            chn->tone_slide = -param * 3.6;
         }
-        // F00: repeat last slide
-        if (!chn->do_tone_slide) {
-            chn->sam_period += chn->tone_slide;
+        else {
+            // F00: repeat last slide
+            // no need to recalculate
         }
+        chn->do_tone_slide = true;
         break;
         
     case 'G'-64:
@@ -266,13 +256,7 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
             }
             else chn->tone_slide = 0;
         }
-        chn->do_vol_slide = false;
-        chn->do_tone_slide = false;
         chn->do_tone_porta = true;
-        chn->do_vibrato = false;
-        chn->do_tremor = false;
-        chn->do_arpeggio = false;
-        chn->do_tremolo = false; 
         break;
         
     case 'H'-64:
@@ -281,13 +265,7 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
             chn->vibrato_speed = (param >> 4);
             chn->vibrato_intensity = param & 0x0F;
             chn->vibrato_pos = 0;
-            chn->do_vol_slide = false;
-            chn->do_tone_slide = false;
-            chn->do_tone_porta = true;
             chn->do_vibrato = true;
-            chn->do_tremor = false;
-            chn->do_arpeggio = false;
-            chn->do_tremolo = false;           
         }
         break;
         
@@ -324,13 +302,6 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
         if (chn->do_vibrato) {
             chn->sam_period = chn->sam_target_period;
         }
-        chn->do_vol_slide = false;
-        chn->do_tone_slide = false;
-        chn->do_tone_porta = false;
-        chn->do_vibrato = false;
-        chn->do_tremor = false;
-        chn->do_arpeggio = false;
-        chn->do_tremolo = false;
         chn->vol_slide = 0;
         chn->tone_slide = 0;
         chn->vibrato_speed = 0;
@@ -380,54 +351,6 @@ void chn_do_fx_frame(s3m_t* s3m, channel_t* chn)
     }
     
     switch (chn->cmd) {
- /*   case 'D'-64:
-        if ((chn->param & 0x0F) != 0) {
-            // D0x: volume slide down by x
-            slide = (chn->param & 0x0F);
-            if (chn->vol > slide) chn->vol -= slide;
-            else chn->vol = 0;
-        }
-        if ((chn->param & 0xF0) != 0) {
-            // Dx0: volume slide up by x
-            slide = (chn->param & 0xF0) >> 4;
-            if (64 - slide < chn->vol) chn->vol += slide;
-            else chn->vol = 64;
-        }
-        break;
-        
-    case 'E'-64:
-    case 'F'-64:
-        // Exx: slide down by xx every frame
-        // Fxx: slide up by xx every frame
-        chn->sam_period += chn->tone_slide;
-        break;
-       
-    case 'G'-64:
-        chn->sam_period += chn->last_tone_slide;
-        if (chn->sam_target_period < chn->sam_period) {
-            if (chn->sam_period <= chn->sam_target_period) { // target reached?
-                chn->sam_period = chn->sam_target_period;
-                chn->last_tone_slide = 0;
-            }
-        } 
-        else if (chn->sam_target_period > chn->sam_period) {
-            if (chn->sam_period >= chn->sam_target_period) { // target reached?
-                chn->sam_period = chn->sam_target_period;
-                chn->last_tone_slide = 0;
-            }
-        }
-        break;
-        
-    case 'H'-64:
-        val = s3m->vibrato_table[chn->vibrato_pos];
-        val = val * chn->vibrato_intensity;
-        val = val / 16;
-       
-        chn->vibrato_pos += chn->vibrato_speed;
-        chn->vibrato_pos %= S3M_VIBRATO_TABLE_SIZE;
-        chn->sam_period = chn->sam_target_period + val; 
-        break;
-*/        
     case 'Q'-64:
         // Qxy: retrigger note
         chn->retrig_fr--;
