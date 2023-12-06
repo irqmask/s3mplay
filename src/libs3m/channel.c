@@ -168,7 +168,7 @@ void chn_do_fx(s3m_t* s3m, channel_t* chn, uint8_t cmd, uint8_t param)
             chn->vol_slide = -(param &= 0x0F);
         }
         // DxF: fine volume slide up by x
-        else if (param & 0x0F == 0x0F) {
+        else if ((param & 0x0F) == 0x0F) {
             chn->vol_slide = (param & 0xF0) >> 4;         
         }
         // D0x or Dx0: volume slide down/up
